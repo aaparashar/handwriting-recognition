@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.4)
+cmake_minimum_required(VERSION 3.0)
 project(NeuralNetwork)
 set(CMAKE_CXX_STANDARD 17)
 
@@ -17,7 +17,7 @@ set(PROJECT_CODE
                                    include/NeuralNetwork/matrix.tpp
                                    include/NeuralNetwork/costFunctionStrategy.h
       src/crossEntropyCost.cpp     include/NeuralNetwork/crossEntropyCost.h
-      src/meanSquereErrorCost.cpp  include/NeuralNetwork/meanSquereErrorCost.h
+      src/meanSquareErrorCost.cpp  include/NeuralNetwork/meanSquareErrorCost.h
       src/image.cpp                include/NeuralNetwork/image.h
       src/layer.cpp                include/NeuralNetwork/layer.h
       src/mnistDataLoader.cpp      include/NeuralNetwork/mnistDataLoader.h

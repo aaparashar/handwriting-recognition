@@ -10,7 +10,7 @@
 #include "image.h"
 #include "reluLayer.h"
 #include "sigmoidLayer.h"
-#include "meanSquereErrorCost.h"
+#include "meanSquareErrorCost.h"
 #include "crossEntropyCost.h"
 
 void UserInterface::clearInputBuffer()
@@ -19,63 +19,66 @@ void UserInterface::clearInputBuffer()
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
 }
 
-void UserInterface::printAsciiImage(const char* image)
+void UserInterface::printAsciiImage(const char *image)
 {
     const unsigned int IMG_SIZE = 28;
     std::cout << "\n";
-    for(unsigned int y = 0, k = 0; y < IMG_SIZE; ++y)
+    for (unsigned int y = 0, k = 0; y < IMG_SIZE; ++y)
     {
-        for(unsigned int x = 0; x < IMG_SIZE; ++x, k+=3)
+        for (unsigned int x = 0; x < IMG_SIZE; ++x, k += 3)
         {
             //if pixel is bright enough
-            if((unsigned char)image[k] > 127)
+            if ((unsigned char)image[k] > 127)
             {
                 std::cout << "X";
             }
-            else std::cout << " ";
+            else
+                std::cout << " ";
         }
         std::cout << "\n";
     }
 }
 
 void UserInterface::handleInteraction()
-{    
-    NeuralNetwork* nn = nullptr;
-    MNISTData* mnistData = nullptr;
+{
+    NeuralNetwork *nn = nullptr;
+    MNISTData *mnistData = nullptr;
 
     //handles states in loop
     //it's a finite-state automaton
     State state = State::ModelNotLoaded;
     unsigned int outputNodes = 0;
 
-    while(state != State::Exit)
+    while (state != State::Exit)
     {
         handleCurrentState(mnistData, nn, state, outputNodes);
     }
 
-    if(mnistData != nullptr) delete mnistData;
-    if(nn != nullptr) delete nn;
+    if (mnistData != nullptr)
+        delete mnistData;
+    if (nn != nullptr)
+        delete nn;
 }
 
-void UserInterface::handleCurrentState(MNISTData* &data, NeuralNetwork* &nn, State &state, unsigned int& outputNodes)
+void UserInterface::handleCurrentState(MNISTData *&data, NeuralNetwork *&nn, State &state, unsigned int &outputNodes)
 {
-    switch(state)
+    switch (state)
     {
-        case State::ModelNotLoaded:
-            handleStateModelNotLoaded(data, nn, state, outputNodes);
-            break;
-        case State::LayersAddition:
-            handleStateLayersAddition(data, nn, state, outputNodes);
-            break;
-        case State::ModelLoaded:
-            handleStateModelLoaded(nn, state);
-            break;
-        default:
-            break;
+    case State::ModelNotLoaded:
+        handleStateModelNotLoaded(data, nn, state, outputNodes);
+        break;
+    case State::LayersAddition:
+        handleStateLayersAddition(data, nn, state, outputNodes);
+        break;
+    case State::ModelLoaded:
+        handleStateModelLoaded(nn, state);
+        break;
+    default:
+        break;
     }
 }
 
-void UserInterface::handleStateModelNotLoaded(MNISTData* &data, NeuralNetwork* &nn, State &state, unsigned int& outputNodes)
+void UserInterface::handleStateModelNotLoaded(MNISTData *&data, NeuralNetwork *&nn, State &state, unsigned int &outputNodes)
 {
     outputNodes = 0;
 
@@ -89,26 +92,27 @@ void UserInterface::handleStateModelNotLoaded(MNISTData* &data, NeuralNetwork* &
         std::cout << ">>>";
 
         std::cin >> choice;
-        if(!std::cin) clearInputBuffer();
-    } while(choice < 1 || choice > 3);
+        if (!std::cin)
+            clearInputBuffer();
+    } while (choice < 1 || choice > 3);
 
-    switch(choice)
+    switch (choice)
     {
-        case 1:
-            std::cout << "\n";
-            handleModelLoading(nn, state);
-            break;
-        case 2:
-            std::cout << "\n";
-            handleModelCreation(data, nn, state);
-            break;
-        case 3:
-            state = State::Exit;
-            break;
+    case 1:
+        std::cout << "\n";
+        handleModelLoading(nn, state);
+        break;
+    case 2:
+        std::cout << "\n";
+        handleModelCreation(data, nn, state);
+        break;
+    case 3:
+        state = State::Exit;
+        break;
     }
 }
 
-void UserInterface::handleStateLayersAddition(const MNISTData* data, NeuralNetwork* nn, State &state, unsigned int& outputNodes)
+void UserInterface::handleStateLayersAddition(const MNISTData *data, NeuralNetwork *nn, State &state, unsigned int &outputNodes)
 {
     int choice;
     do
@@ -120,73 +124,74 @@ void UserInterface::handleStateLayersAddition(const MNISTData* data, NeuralNetwo
         std::cout << ">>>";
 
         std::cin >> choice;
-        if(!std::cin) clearInputBuffer();
-    } while(choice < 1 || choice > 3);
+        if (!std::cin)
+            clearInputBuffer();
+    } while (choice < 1 || choice > 3);
 
     std::cout << "\n";
 
-    switch(choice)
+    switch (choice)
     {
-        case 1:
-            addLayer<ReLULayer>(nn, outputNodes);
-            break;
-        case 2:
-            addLayer<SigmoidLayer>(nn, outputNodes);
-            break;
-        case 3:
-            if(nn->getLayersCount() == 0)
-            {
-                std::cout << "Please add at least one layer.\n\n";
-            }
-            else if(outputNodes != 10)
-            {
-                std::cout << "Last layer has to have 10 nodes!\n";
-                state = State::ModelNotLoaded;
-            }
-            else trainModel(data, nn, state);
-            break;
+    case 1:
+        addLayer<ReLULayer>(nn, outputNodes);
+        break;
+    case 2:
+        addLayer<SigmoidLayer>(nn, outputNodes);
+        break;
+    case 3:
+        if (nn->getLayersCount() == 0)
+        {
+            std::cout << "Please add at least one layer.\n\n";
+        }
+        else if (outputNodes != 10)
+        {
+            std::cout << "Last layer has to have 10 nodes!\n";
+            state = State::ModelNotLoaded;
+        }
+        else
+            trainModel(data, nn, state);
+        break;
     }
 }
 
 template <typename T>
-void UserInterface::addLayer(NeuralNetwork* nn, unsigned int& outputNodes)
+void UserInterface::addLayer(NeuralNetwork *nn, unsigned int &outputNodes)
 {
     unsigned int nodes = 0;
     do
     {
         std::cout << "How many nodes should this layer have?\n>>>";
         std::cin >> nodes;
-        if(!std::cin)
+        if (!std::cin)
         {
             clearInputBuffer();
             nodes = 0;
         }
-    } while(nodes < 1);
+    } while (nodes < 1);
 
     nn->addLayer<T>(nodes);
     outputNodes = nodes;
-    
+
     std::cout << "\n";
 }
 
-void UserInterface::trainModel(const MNISTData* data, NeuralNetwork* nn, State &state)
+void UserInterface::trainModel(const MNISTData *data, NeuralNetwork *nn, State &state)
 {
-    auto readIntFromUserInputAndVerify = [](const char* prompt, unsigned int &value, unsigned int condition) 
-    { 
+    auto readIntFromUserInputAndVerify = [](const char *prompt, unsigned int &value, unsigned int condition) {
         do
         {
             std::cout << prompt;
             std::cin >> value;
-            if(!std::cin)
+            if (!std::cin)
             {
                 clearInputBuffer();
                 value = 0;
             }
-        } while(value < condition);
+        } while (value < condition);
     };
 
     unsigned int nEpochs;
-    unsigned int batchSize; 
+    unsigned int batchSize;
 
     readIntFromUserInputAndVerify("Epochs: ", nEpochs, 1);
     readIntFromUserInputAndVerify("Batch size: ", batchSize, 1);
@@ -206,7 +211,7 @@ void UserInterface::trainModel(const MNISTData* data, NeuralNetwork* nn, State &
     state = State::ModelLoaded;
 }
 
-void UserInterface::handleStateModelLoaded(NeuralNetwork* nn, State &state)
+void UserInterface::handleStateModelLoaded(NeuralNetwork *nn, State &state)
 {
     unsigned int choice;
     do
@@ -219,41 +224,43 @@ void UserInterface::handleStateModelLoaded(NeuralNetwork* nn, State &state)
         std::cout << ">>>";
 
         std::cin >> choice;
-        if(!std::cin) clearInputBuffer();
-    } while(choice < 1 || choice > 4);
+        if (!std::cin)
+            clearInputBuffer();
+    } while (choice < 1 || choice > 4);
 
-    switch(choice)
+    switch (choice)
     {
-        case 1:
-            std::cout << "\n";
-            handleDigitRecognition(nn);
-            break;
-        case 2:
-            state = State::ModelNotLoaded;
-            std::cout << "\n";
-            break;
-        case 3:
-            std::cout << "\n";
-            handleModelSave(nn);
-            break;
-        case 4:
-            state = State::Exit;
-            break;
+    case 1:
+        std::cout << "\n";
+        handleDigitRecognition(nn);
+        break;
+    case 2:
+        state = State::ModelNotLoaded;
+        std::cout << "\n";
+        break;
+    case 3:
+        std::cout << "\n";
+        handleModelSave(nn);
+        break;
+    case 4:
+        state = State::Exit;
+        break;
     }
 }
 
-void UserInterface::handleModelLoading(NeuralNetwork* &nn, State &state)
+void UserInterface::handleModelLoading(NeuralNetwork *&nn, State &state)
 {
     std::cout << "Enter model filename: ";
     std::string filename;
     std::cin >> filename;
 
-    if(nn != nullptr) delete nn;
+    if (nn != nullptr)
+        delete nn;
     try
     {
         nn = NeuralNetwork::load(filename.c_str());
     }
-    catch(const data_load_failure& ex)
+    catch (const data_load_failure &ex)
     {
         std::cout << ex.what() << "\n";
         state = State::ModelNotLoaded;
@@ -264,16 +271,16 @@ void UserInterface::handleModelLoading(NeuralNetwork* &nn, State &state)
     state = State::ModelLoaded;
 }
 
-void UserInterface::handleModelCreation(MNISTData* &data, NeuralNetwork* &nn, State &state)
+void UserInterface::handleModelCreation(MNISTData *&data, NeuralNetwork *&nn, State &state)
 {
-    if(!data)
+    if (!data)
     {
         try
         {
-            data = MNISTDataLoader::loadData("data/train-images.idx3-ubyte", "data/train-labels.idx1-ubyte", 
+            data = MNISTDataLoader::loadData("data/train-images.idx3-ubyte", "data/train-labels.idx1-ubyte",
                                              "data/t10k-images.idx3-ubyte", "data/t10k-labels.idx1-ubyte");
         }
-        catch(const data_load_failure& ex)
+        catch (const data_load_failure &ex)
         {
             std::cout << "Loading model data failed! Application will be closed now.\n";
             state = State::Exit;
@@ -281,19 +288,20 @@ void UserInterface::handleModelCreation(MNISTData* &data, NeuralNetwork* &nn, St
         }
     }
 
-    if(nn != nullptr) delete nn;
+    if (nn != nullptr)
+        delete nn;
 
     float learingRate;
     do
     {
         std::cout << "Learning rate: ";
         std::cin >> learingRate;
-        if(!std::cin)
+        if (!std::cin)
         {
             clearInputBuffer();
             learingRate = -1;
         }
-    } while(learingRate <= 0);
+    } while (learingRate <= 0);
 
     std::unique_ptr<CostFunctionStrategy> costFunction = nullptr;
 
@@ -306,16 +314,17 @@ void UserInterface::handleModelCreation(MNISTData* &data, NeuralNetwork* &nn, St
         std::cout << ">>>";
 
         std::cin >> choice;
-        if(!std::cin) clearInputBuffer();
-    } while(choice < 1 || choice > 2);
+        if (!std::cin)
+            clearInputBuffer();
+    } while (choice < 1 || choice > 2);
 
-    switch(choice)
+    switch (choice)
     {
-        case 1:
-            costFunction = std::make_unique<MeanSquereErrorCost>();
-            break;
-        case 2:
-            costFunction = std::make_unique<CrossEntropyCost>();
+    case 1:
+        costFunction = std::make_unique<MeanSquareErrorCost>();
+        break;
+    case 2:
+        costFunction = std::make_unique<CrossEntropyCost>();
     }
 
     nn = new NeuralNetwork(784, learingRate, std::move(costFunction));
@@ -325,24 +334,24 @@ void UserInterface::handleModelCreation(MNISTData* &data, NeuralNetwork* &nn, St
     std::cout << "\n";
 }
 
-void UserInterface::handleDigitRecognition(const NeuralNetwork* nn)
+void UserInterface::handleDigitRecognition(const NeuralNetwork *nn)
 {
     std::cout << "Enter image filename: ";
     std::string filename;
     std::cin >> filename;
-    
+
     std::unique_ptr<Image> img = nullptr;
     try
     {
         img = std::make_unique<Image>(filename.c_str());
     }
-    catch(const data_load_failure& ex)
+    catch (const data_load_failure &ex)
     {
         std::cout << ex.what() << "\n";
         return;
     }
-    
-    if(img->getWidth() != 28 || img->getHeight() != 28)
+
+    if (img->getWidth() != 28 || img->getHeight() != 28)
     {
         std::cout << "Improper image size! Make sure that the image has dimentions 28x28.\n";
         return;
@@ -350,11 +359,11 @@ void UserInterface::handleDigitRecognition(const NeuralNetwork* nn)
 
     const unsigned int IMAGE_PIXELS = 784;
     float matrixData[IMAGE_PIXELS];
-    const char* imagePixels = img->getPixels();
+    const char *imagePixels = img->getPixels();
 
-    for(unsigned int i = 0; i < IMAGE_PIXELS; ++i)
+    for (unsigned int i = 0; i < IMAGE_PIXELS; ++i)
     {
-        matrixData[i] = ((unsigned char)imagePixels[3*i])/255.0f;
+        matrixData[i] = ((unsigned char)imagePixels[3 * i]) / 255.0f;
     }
 
     NNMatrixType inputMatrix = NNMatrixType(matrixData, IMAGE_PIXELS, 1);
@@ -362,9 +371,9 @@ void UserInterface::handleDigitRecognition(const NeuralNetwork* nn)
 
     unsigned int predictedLabel = 0;
     float max = resultMatrix.get(0, 0);
-    for(unsigned int i = 0; i < resultMatrix.getRows(); ++i)
+    for (unsigned int i = 0; i < resultMatrix.getRows(); ++i)
     {
-        if(resultMatrix.get(i, 0) > max)
+        if (resultMatrix.get(i, 0) > max)
         {
             predictedLabel = i;
             max = resultMatrix.get(i, 0);
@@ -373,11 +382,13 @@ void UserInterface::handleDigitRecognition(const NeuralNetwork* nn)
 
     printAsciiImage(imagePixels);
 
-    std::cout << "Result matrix:\n" << resultMatrix << "\n\n";
-    std::cout << "Predicted Label:\n" << predictedLabel << "\n\n";
+    std::cout << "Result matrix:\n"
+              << resultMatrix << "\n\n";
+    std::cout << "Predicted Label:\n"
+              << predictedLabel << "\n\n";
 }
 
-void UserInterface::handleModelSave(const NeuralNetwork* nn)
+void UserInterface::handleModelSave(const NeuralNetwork *nn)
 {
     std::cout << "Enter model filename: ";
     std::string filename;
