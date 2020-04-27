@@ -48,10 +48,10 @@ void NeuralNetwork::train(unsigned int epochs,
 {
     //Prepare permutation table for training data shuffle
     size_t trainingSize = inputs.size();
-    std::vector<unsigned int> permutaionTable(trainingSize);
+    std::vector<unsigned int> permutationTable(trainingSize);
     for (size_t i = 0; i < trainingSize; ++i)
     {
-        permutaionTable[i] = i;
+        permutationTable[i] = i;
     }
 
     //Initialize PRNG
@@ -66,7 +66,7 @@ void NeuralNetwork::train(unsigned int epochs,
     for (unsigned int epoch = 0; epoch < epochs; ++epoch)
     {
         std::cout << "Epoch " << epoch + 1 << " out of " << epochs << "\n";
-        std::shuffle(permutaionTable.begin(), permutaionTable.end(), generator);
+        std::shuffle(permutationTable.begin(), permutationTable.end(), generator);
         for (unsigned int n = 0; n < numBatches; ++n)
         {
             //Train on single batch
@@ -78,8 +78,8 @@ void NeuralNetwork::train(unsigned int epochs,
                 if (idx >= trainingSize)
                     break;
 
-                input = *inputs[permutaionTable[idx]];
-                target = *targets[permutaionTable[idx]];
+                input = *inputs[permutationTable[idx]];
+                target = *targets[permutationTable[idx]];
 
                 if (input.getRows() != inputNodes_ || input.getColumns() != 1)
                 {
@@ -93,7 +93,7 @@ void NeuralNetwork::train(unsigned int epochs,
             //Adjust weights and biases after finishing batch
             for (auto it = layers_.begin(); it < layers_.end(); ++it)
             {
-                (*it)->performSDGStep(learningRate_);
+                (*it)->performSGDStep(learningRate_);
             }
         }
     }

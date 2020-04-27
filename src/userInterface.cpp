@@ -294,7 +294,7 @@ void UserInterface::handleModelCreation(MNISTData *&data, NeuralNetwork *&nn, St
     float learingRate;
     do
     {
-        std::cout << "Learning rate: ";
+        std::cout << "Learning Rate: ";
         std::cin >> learingRate;
         if (!std::cin)
         {
@@ -382,7 +382,7 @@ void UserInterface::handleDigitRecognition(const NeuralNetwork *nn)
 
     printAsciiImage(imagePixels);
 
-    std::cout << "Result matrix:\n"
+    std::cout << "Result Matrix:\n"
               << resultMatrix << "\n\n";
     std::cout << "Predicted Label:\n"
               << predictedLabel << "\n\n";

@@ -5,12 +5,12 @@
 Layer::Layer(unsigned int nodes, unsigned int prevNodes)
 {
     nodes_ = nodes;
-    
+
     weights_ = NNMatrixType(nodes, prevNodes);
     bias_ = NNMatrixType(nodes, 1);
 
     //initializes weights is this way so as to the keep values reasonably small
-    float r = 4.0*std::sqrt(6.0/(nodes + prevNodes));
+    float r = 4.0 * std::sqrt(6.0 / (nodes + prevNodes));
     weights_.randomize(-r, r);
 
     bias_.zero();
@@ -28,21 +28,21 @@ unsigned int Layer::getNodesCount() const
     return nodes_;
 }
 
-NNMatrixType Layer::feedforward(const NNMatrixType& input, NNMatrixType& weightedInput)
+NNMatrixType Layer::feedforward(const NNMatrixType &input, NNMatrixType &weightedInput)
 {
     weightedInput = calculateWeightedInput(input);
     return weightedInput.map(std::bind(&Layer::activationFunction, this, std::placeholders::_1));
 }
 
-NNMatrixType Layer::feedforward(const NNMatrixType& input) const
+NNMatrixType Layer::feedforward(const NNMatrixType &input) const
 {
     NNMatrixType weightedInput = calculateWeightedInput(input);
     return weightedInput.map(std::bind(&Layer::activationFunction, this, std::placeholders::_1));
 }
 
-NNMatrixType Layer::backpropagate(const NNMatrixType& error,
-                                    const NNMatrixType& weightedInput,
-                                    const NNMatrixType& prevOutput)
+NNMatrixType Layer::backpropagate(const NNMatrixType &error,
+                                  const NNMatrixType &weightedInput,
+                                  const NNMatrixType &prevOutput)
 {
     //Calculates dC/dz = dC/da * da/dz, where da/dz is the derivative of the activation function
     NNMatrixType delta = error.hadamard(weightedInput.map(std::bind(&Layer::activationDerivative, this, std::placeholders::_1)));
@@ -59,12 +59,12 @@ NNMatrixType Layer::backpropagate(const NNMatrixType& error,
     return output;
 }
 
-NNMatrixType Layer::calculateWeightedInput(const NNMatrixType& input) const
+NNMatrixType Layer::calculateWeightedInput(const NNMatrixType &input) const
 {
-    return weights_*input + bias_;
+    return weights_ * input + bias_;
 }
 
-void Layer::performSDGStep(float learningRate)
+void Layer::performSGDStep(float learningRate)
 {
     weights_ -= nablaW_ * learningRate;
     bias_ -= nablaB_ * learningRate;
@@ -74,14 +74,14 @@ void Layer::performSDGStep(float learningRate)
     nablaB_.zero();
 }
 
-void Layer::serializeMatricies(std::ofstream& ofile) const
+void Layer::serializeMatrix(std::ofstream &ofile) const
 {
     auto rows = weights_.getRows();
     auto columns = weights_.getColumns();
-    auto len = rows*columns;
-    
-    ofile.write((char*)&rows, sizeof(rows));
-    ofile.write((char*)&columns, sizeof(columns));
-    ofile.write((char*)weights_.getData(), len*sizeof(NNDataType));
-    ofile.write((char*)bias_.getData(), rows*sizeof(NNDataType));
+    auto len = rows * columns;
+
+    ofile.write((char *)&rows, sizeof(rows));
+    ofile.write((char *)&columns, sizeof(columns));
+    ofile.write((char *)weights_.getData(), len * sizeof(NNDataType));
+    ofile.write((char *)bias_.getData(), rows * sizeof(NNDataType));
 }
