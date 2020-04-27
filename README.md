@@ -3,5 +3,5 @@
 To run:\
 cmake .\
 make\
-cd ./bin; ./NeuralNetwork\
+cd ./bin; ./NeuralNetwork
 
